@@ -1,5 +1,18 @@
-var builder = WebApplication.CreateBuilder(args);
+using Microsoft.EntityFrameworkCore;
+using TutorManagementSystem.Models.Contact;
+using Microsoft.AspNetCore.Identity;
+using TutorManagementSystem.Areas.Identity.Data;
 
+var builder = WebApplication.CreateBuilder(args);
+var connectionString = builder.Configuration.GetConnectionString("dbcs") ?? throw new InvalidOperationException("Connection string 'dbcs' not found.");
+
+builder.Services.AddDbContext<ContactDBContext>(options =>
+    options.UseSqlServer(connectionString));
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(connectionString));
+
+builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddEntityFrameworkStores<ApplicationDbContext>();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
@@ -17,6 +30,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseAuthentication();;
 
 app.UseAuthorization();
 app.UseEndpoints(endpoints =>
@@ -31,5 +45,5 @@ app.UseEndpoints(endpoints =>
    );
 });
 
-
+app.MapRazorPages();
 app.Run();
